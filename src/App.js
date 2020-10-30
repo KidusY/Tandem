@@ -7,6 +7,7 @@ class App extends React.Component {
 		super();
 		this.state = {
 			start: false,
+			end: false,
 			currentQuestion: {},
 			currentAnswers: [],
 			currentQuestionNumber: 0,
@@ -38,7 +39,9 @@ class App extends React.Component {
 		];
 		this.shuffleArray(Answers);
 		this.setState({ currentAnswers: Answers });
-		this.setState({ currentQuestionNumber: this.state.currentQuestionNumber + 1 });
+		if (this.state.currentQuestionNumber < 20)
+			this.setState({ currentQuestionNumber: this.state.currentQuestionNumber + 1 });
+		else this.setState({ end: true });
 	};
 	validateQuestion = (input) => {
 		let selectedAnswer;
@@ -64,43 +67,77 @@ class App extends React.Component {
 		console.log(this.state.score);
 		return (
 			<div className="App">
-      <h2 className="score">Score: {this.state.score} / {questions.length - 1}</h2>
-      <div className="container">
-      <div> 
-      {this.state.showStartBtn ? <button id="startBtn" onClick={() => this.getQuestion()}> Start </button> : <div />}
-				{this.state.start ? (
-					<Question
-						currentQuestion={this.state.currentQuestion}
-						validateQuestion={this.validateQuestion}
-						Answers={this.state.currentAnswers}
-            currentQuestionNumber={this.state.currentQuestionNumber -1}
-					/>
-				) : (
-					<div />
-				)}
-
-				{this.state.showModal ? (
+				<h2 className="score">
+					Score: {this.state.score} / {questions.length - 1}
+				</h2>
+				<div className="container">
 					<div>
-						{' '}
-						The correct Answer is : {questions[this.state.currentQuestionNumber - 1].correct}
-						<button
-							onClick={() => {
-								this.getQuestion();
-								this.setState({ showModal: false });
-							}}
-						>
-							Next
-						</button>
-					</div>
-				) : (
-					<div />
-				)}
+						{this.state.showStartBtn ? (
+							<div>
+								<h1> Welcome To Tandem Trivia </h1>
+								<button id="startBtn" onClick={() => this.getQuestion()}>
+									{' '}
+									Start{' '}
+								</button>
+							</div>
+						) : (
+							<div />
+						)}
+						{this.state.start && !this.state.end ? (
+							<Question
+								currentQuestion={this.state.currentQuestion}
+								validateQuestion={this.validateQuestion}
+								Answers={this.state.currentAnswers}
+								currentQuestionNumber={this.state.currentQuestionNumber - 1}
+							/>
+						) : (
+							<div />
+						)}
 
-      </div>
-     
-				
-      </div>
-				
+						{this.state.showModal ? (
+							<div className="modal">
+								<div>
+									The correct Answer is : {questions[this.state.currentQuestionNumber - 1].correct}
+									<br />
+									<button
+										onClick={() => {
+											this.getQuestion();
+											this.setState({ showModal: false });
+										}}
+									>
+										Next
+									</button>
+								</div>
+							</div>
+						) : (
+							<div />
+						)}
+
+						{this.state.end ? (
+							<div className="modal">
+								<div>
+									Your Total Score is : {this.state.score}
+									<br />
+									<button
+										onClick={() => {
+											this.setState({
+												end: false,
+												currentQuestionNumber: 0,
+												start: false,
+												showStartBtn: true,
+                        score:0
+											});
+										}}
+									>
+										Next
+									</button>
+								</div>
+							</div>
+						) : (
+							<div />
+						)}
+					</div>
+				</div>
 			</div>
 		);
 	}
